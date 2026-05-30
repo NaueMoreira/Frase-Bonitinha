@@ -21,5 +21,56 @@
             </div>
         </div>
     </div>
+    <!-- Player de áudio (tenta autoplay; se bloqueado, mostra botão para o usuário) -->
+    <script>
+        (function(){
+            const audio = document.createElement('audio');
+            audio.id = 'bg-audio';
+            audio.src = 'audio/te-esperando.mp4'; // coloque seu arquivo em audio/music.mp3 ou altere para uma URL
+            audio.loop = true;
+            audio.preload = 'auto';
+            audio.volume = 0.8;
+            audio.style.display = 'none';
+            document.body.appendChild(audio);
+
+            function showPlayButton(){
+                if (document.getElementById('play-audio-btn')) return;
+                const btn = document.createElement('button');
+                btn.id = 'play-audio-btn';
+                btn.textContent = 'Clique para ouvir música';
+                Object.assign(btn.style, {
+                    position: 'fixed',
+                    bottom: '16px',
+                    right: '16px',
+                    padding: '8px 12px',
+                    zIndex: 9999,
+                    cursor: 'pointer'
+                });
+                btn.addEventListener('click', function(){
+                    audio.play().catch(()=>{});
+                    btn.style.display = 'none';
+                });
+                document.body.appendChild(btn);
+            }
+
+            function tryPlay(){
+                const p = audio.play();
+                if (p !== undefined) {
+                    p.catch(() => {
+                        showPlayButton();
+                    });
+                }
+            }
+
+            window.addEventListener('load', tryPlay);
+            // Em caso de interação do usuário, tenta tocar novamente (alguns navegadores liberam após qualquer click)
+            ['click','touchstart','keydown'].forEach(evt => {
+                window.addEventListener(evt, function once(){
+                    if (audio.paused) audio.play().catch(()=>{});
+                    window.removeEventListener(evt, once);
+                });
+            });
+        })();
+    </script>
 </body>
 </html>
